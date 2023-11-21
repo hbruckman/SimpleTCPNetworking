@@ -1,10 +1,7 @@
 ﻿namespace SimpleTCPNetworking;
 
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public class SimpleTCPServer
 {
@@ -22,6 +19,8 @@ public class SimpleTCPServer
 
 	public void StartListening()
 	{
+		Console.WriteLine("### Begin Start Listening ###");
+
 		server.Start();
 		isListening = true;
 
@@ -37,26 +36,38 @@ public class SimpleTCPServer
 			
 			}
 		}
+
+		Console.WriteLine("### End Start Listening ###");
 	}
 
 	public void StopListening()
 	{
+		Console.WriteLine("### Begin Stop Listening ###");
+
 		isListening = false;
 		server.Stop();
 
 		Task.WaitAll(pendingTasks.ToArray());
+
+		Console.WriteLine("### End Stop Listening ###");
 	}
 
 	private void HandleClient(TcpClient client)
 	{
-		NetworkStream ns = client.GetStream();
+		Console.WriteLine("### Begin Handle Client ###");
 
-		BinaryReader br = new BinaryReader(ns);
-		BinaryWriter bw = new BinaryWriter(ns);
+		using (client)
+		{
+			NetworkStream ns = client.GetStream();
 
-		string name = br.ReadString();
-		bw.Write($"Hi, {name}!");
+			BinaryReader br = new BinaryReader(ns);
+			BinaryWriter bw = new BinaryWriter(ns);
 
-		client.Dispose();
+			string name = br.ReadString();
+			bw.Write($"Hi, {name}!");
+
+		} // Does client.Dispose() even if an error occurs.
+
+		Console.WriteLine("### End Handle Client ###");
 	}
 }

@@ -15,18 +15,24 @@ public class SimpleTCPClient
 
 	public void ConnectToServer()
 	{
-		client.Connect("localhost", 8080);
+		Console.WriteLine("### Begin Connect to Server ###");
 
-		NetworkStream ns = client.GetStream();
+		using (client)
+		{
+			client.Connect("localhost", 8080);
 
-		BinaryReader br = new BinaryReader(ns);
-		BinaryWriter bw = new BinaryWriter(ns);
+			NetworkStream ns = client.GetStream();
 
-		bw.Write(name);
-		string greeting = br.ReadString();
+			BinaryReader br = new BinaryReader(ns);
+			BinaryWriter bw = new BinaryWriter(ns);
 
-		Console.WriteLine(greeting);
+			bw.Write(name);
+			string greeting = br.ReadString();
 
-		client.Dispose();
+			Console.WriteLine(greeting);
+
+		} // Does client.Dispose() even if an error occurs.
+
+		Console.WriteLine("### End Connect to Server ###");
 	}
 }
